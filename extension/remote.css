@@ -1,0 +1,47 @@
+/* スマホで操作（R1）の画面。色・間隔・角丸は docs/design/DESIGN.md の token（panel.css の :root）だけを使う */
+#remote { order:4; flex:1 0 100%; min-height:0; max-height:100%; display:flex; flex-direction:column; overflow:hidden; }
+#sessions:has(> #remote:not([hidden])) :is(#turn-line, #find-text, #roots-empty) { display:none; }
+#remote-hd { flex:none; display:flex; align-items:center; gap:var(--sp-2); min-height:var(--h-header); padding:var(--sp-2) var(--gutter) var(--sp-2) var(--header-start); border-bottom:var(--line-w) solid var(--border); }
+#remote-hd h1 { margin:0; font-size:var(--fs-heading); line-height:var(--lh-heading); font-weight:var(--fw-strong); }
+#remote-body { flex:1; min-height:0; overflow-y:auto; padding:var(--sp-5) var(--gutter); display:flex; flex-direction:column; gap:var(--sp-4); }
+#remote-body .remote-line { margin:0; font-size:var(--fs-body); line-height:var(--lh-body); }
+#remote-body .remote-warn { margin:0; font-size:var(--fs-meta); line-height:var(--lh-meta); color:var(--turn); }
+#remote-body .remote-foot { margin:0; font-size:var(--fs-time); line-height:var(--lh-time); color:var(--subtle-fg); }
+#remote-body .remote-qr, #remote-body .remote-card { display:flex; flex-direction:column; align-items:center; gap:var(--sp-3); padding:var(--card-pad); border:var(--line-w) solid var(--border); border-radius:var(--r-lg); background:var(--card); }
+#remote-body .remote-qr img { width:min(100%, 248px); height:auto; aspect-ratio:1; border-radius:var(--r-md); background:#fff; padding:var(--sp-2); image-rendering:pixelated; }
+#remote-body .remote-left { margin:0; font-size:var(--fs-meta); line-height:var(--lh-meta); color:var(--muted-fg); font-variant-numeric:tabular-nums; }
+#remote-body .remote-card { align-items:stretch; }
+#remote-body .remote-card h2 { margin:0; font-size:var(--fs-card-title); line-height:var(--lh-card-title); font-weight:var(--fw-strong); }
+#remote-body .remote-code { margin:0; font-size:28px; line-height:40px; font-weight:var(--fw-strong); letter-spacing:.12em; text-align:center; font-variant-numeric:tabular-nums; }
+#remote-body .remote-btns { display:flex; gap:var(--button-gap); flex-wrap:wrap; }
+#remote-body .remote-btns .btn { flex:1; }
+#remote-body .btn { min-height:var(--hit); padding:var(--sp-2) var(--button-pad-x); border:0; border-radius:var(--r-md); font-size:var(--fs-meta); line-height:var(--lh-meta); font-weight:var(--fw-medium); cursor:pointer; }
+#remote-body .btn.primary { background:var(--primary); color:var(--primary-fg); }
+#remote-body .btn.primary:hover { background:var(--primary-hover); }
+#remote-body .btn.primary:active { background:var(--primary-active); }
+#remote-body .btn.quiet { background:transparent; color:var(--fg); }
+#remote-body .btn.quiet:hover { background:var(--hover); }
+#remote-body .btn.quiet:active { background:var(--active); }
+#remote-body .btn:disabled { background:var(--disabled-bg); color:var(--disabled-fg); cursor:not-allowed; }
+#remote-body .btn:focus-visible { outline:var(--focus-w) solid var(--focus); outline-offset:var(--focus-offset); }
+#remote-body .remote-devs { display:flex; flex-direction:column; gap:var(--sp-1); }
+#remote-body .remote-label { margin:0; padding:0 var(--sp-3); font-size:var(--fs-meta); line-height:var(--lh-meta); font-weight:var(--fw-normal); color:var(--muted-fg); }
+#remote-body .remote-dev { display:flex; align-items:center; gap:var(--sp-3); min-height:var(--hit); padding:var(--sp-2) var(--sp-3); }
+#remote-body .remote-who { flex:1; min-width:0; }
+#remote-body .remote-name { font-size:var(--fs-name); line-height:var(--lh-name); font-weight:var(--fw-medium); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+#remote-body .remote-state { font-size:var(--fs-status); line-height:var(--lh-status); color:var(--muted-fg); }
+/* 一覧の頭の「…」と、開いた時の 1 行（会話の「…」と同じ作り: 別の窓にせず、頭の下に出る） */
+#list-more { flex:none; width:var(--hit); height:var(--hit); padding:0; border:0; border-radius:var(--r-sm); background:transparent; color:var(--muted-fg); font-size:var(--ic-3); line-height:1; cursor:pointer; }
+#list-more:hover { background:var(--hover); color:var(--fg); }
+#list-more:active { background:var(--active); color:var(--fg); }
+#list-more:focus-visible { outline:var(--focus-w) solid var(--focus); outline-offset:var(--focus-offset); }
+#list-menu { order:0; flex:1 0 100%; display:flex; flex-direction:column; padding:var(--sp-1) var(--sp-3); border-bottom:var(--line-w) solid var(--border); }
+#list-menu button { min-height:var(--hit); padding:var(--sp-2) var(--sp-3); border:0; border-radius:var(--r-sm); background:transparent; color:var(--fg); font:inherit; font-size:var(--fs-body); text-align:left; cursor:pointer; }
+#list-menu button:hover { background:var(--hover); }
+#list-menu button:active { background:var(--active); }
+#list-menu button:focus-visible { outline:var(--focus-w) solid var(--focus); outline-offset:var(--focus-offset); }
+#remote-body .remote-hint { margin:0; padding:0 var(--sp-3); font-size:var(--fs-meta); line-height:var(--lh-meta); color:var(--muted-fg); }
+#remote-body .remote-opt { cursor:pointer; }
+#remote-body .remote-opt input { flex:none; width:var(--toggle-w); height:var(--toggle-h); accent-color:var(--primary); cursor:pointer; }
+#remote-body .remote-opt:hover { background:var(--hover); border-radius:var(--r-sm); }
+#remote-body .remote-opt input:focus-visible { outline:var(--focus-w) solid var(--focus); outline-offset:var(--focus-offset); }

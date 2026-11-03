@@ -1,0 +1,29 @@
+#!/bin/sh
+# 試験用の fake adb（本物の adb は呼ばない）。引数で振る舞う。記録: $FAKE_ADB_LOG（argv）・$FAKE_ADB_STDIN（pair の stdin）・$FAKE_ADB_TAPS（tap の座標）
+# 本物の server（5037）に当たらないよう、port が無い / 5037 なら動かない。
+case "${ANDROID_ADB_SERVER_PORT:-}" in ""|5037) echo "fake-adb: ANDROID_ADB_SERVER_PORT が無いか 5037（本物）です" >&2; exit 99;; esac
+HERE=$(cd "$(dirname "$0")" && pwd)
+[ -n "${FAKE_ADB_LOG:-}" ] && echo "$*" >> "$FAKE_ADB_LOG"
+[ "${1:-}" = "-s" ] && shift 2
+case "${1:-}" in
+  pair)
+    IFS= read -r code || true
+    [ -n "${FAKE_ADB_STDIN:-}" ] && printf '%s' "$code" > "$FAKE_ADB_STDIN"
+    if [ "${FAKE_ADB_MODE:-}" != fail ] && [ "$code" = "${FAKE_ADB_CODE:-123456}" ]; then
+      echo "Successfully paired to $2 [guid=adb-FAKE0001-abcdef]"
+    else
+      echo "Failed: Wrong password or connection was dropped ($2 code $code)"; exit 1
+    fi ;;
+  devices) printf 'List of devices attached\nFAKE0001               device usb:1-1 product:panther model:Pixel_7 device:panther transport_id:1\n\n' ;;
+  exec-out)
+    if [ "${2:-}" = uiautomator ]; then
+      [ -n "${FAKE_ADB_TTY_EMPTY:-}" ] || cat "$HERE/fake-ui.xml"
+      echo "UI hierchary dumped to: /dev/tty"
+    elif [ "${2:-}" = cat ]; then cat "$HERE/fake-ui.xml"; fi ;;
+  shell)
+    case "${2:-}" in
+      uiautomator) echo "UI hierchary dumped to: ${4:-/sdcard/ui.xml}" ;;
+      input) [ -n "${FAKE_ADB_TAPS:-}" ] && echo "${4:-} ${5:-}" >> "$FAKE_ADB_TAPS" ;;
+    esac ;;
+  *) echo "fake-adb: 知らない呼び: $*" >&2; exit 2 ;;
+esac

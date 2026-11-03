@@ -1,0 +1,31 @@
+# 開発メモ（public にする時に出ないよう最初から ignore）
+task/
+backlog/
+docs/internal/
+*_PLAN.md
+*_ROADMAP.md
+*_AUDIT.md
+SCORECARD.md
+STATUS.md
+PROJECT.md
+CLAUDE.md
+AGENTS.md
+.claude/
+arc.md
+task.md
+*.log
+
+# 個人情報・ローカル環境・鍵
+.env*
+*.db
+*.sqlite*
+*.pem
+*.key
+
+# build
+node_modules/
+dist/
+build/
+.profile/
+.cursor/
+.cache/

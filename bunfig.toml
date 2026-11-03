@@ -1,0 +1,3 @@
+[test]
+preload = ["./test/preload-home.ts"]
+# 1 本あたりの締切は tools/suite.ts と tools/affected.ts が `bun test --timeout 30000` で渡す（ここの [test] timeout は bun 1.3.14 で読まれず、preload の setDefaultTimeout も最初の 1 file にしか効かない＝実測）

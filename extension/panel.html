@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="ja">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kangae</title>
+<link rel="stylesheet" href="panel.css">
+<link rel="stylesheet" href="remote.css">
+<script src="port.js"></script>
+<body>
+  <div id="drag" aria-hidden="true"></div>
+  <div id="empty">
+    <div id="first" hidden></div>
+    <p id="empty-msg">何をしてほしいかを書いて Enter</p>
+    <div id="down" hidden>
+      <p id="down-how">Kangae Bar を開き直してください。つながると、この画面が自動で戻ります。</p>
+      <button type="button" id="retry">もう一度つなぐ</button>
+    </div>
+    <form id="empty-form" autocomplete="off">
+      <input id="empty-text" placeholder="例: 今日のメールを整理して" disabled title="つながるまで">
+    </form>
+  </div>
+  <div id="app" hidden>
+    <button id="stop-all" type="button" class="btn stopall" hidden>全部止める</button>
+    <section id="leases" aria-label="agent に渡した窓" hidden></section>
+    <section id="screen-engine" aria-label="画面の操作"></section>
+    <section id="sessions" aria-label="session">
+      <header id="list-hd">
+        <kg-back id="list-back" depth="0" aria-label="前の画面へ（2 度押しで一覧）" title="前の画面へ（2 度押しで一覧）"></kg-back>
+        <button type="button" id="list-more" aria-expanded="false" aria-label="その他" title="その他">…</button>
+        <button type="button" id="user-btn" aria-label="設定" title="設定"><svg class="ic" viewBox="0 0 20 20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M8.43 3.69L8.61 1.72L11.39 1.72L11.57 3.69L13.35 4.43L14.88 3.16L16.84 5.12L15.57 6.65L16.31 8.43L18.28 8.61L18.28 11.39L16.31 11.57L15.57 13.35L16.84 14.88L14.88 16.84L13.35 15.57L11.57 16.31L11.39 18.28L8.61 18.28L8.43 16.31L6.65 15.57L5.12 16.84L3.16 14.88L4.43 13.35L3.69 11.57L1.72 11.39L1.72 8.61L3.69 8.43L4.43 6.65L3.16 5.12L5.12 3.16L6.65 4.43z"/><circle cx="10" cy="10" r="2.6"/></svg></button>
+      </header>
+      <div id="list-menu" hidden>
+        <button type="button" id="open-remote">スマホで操作</button>
+      </div>
+      <ul id="roots"></ul>
+      <p id="roots-empty" hidden>まだ担当がいません。会話を始めると、ここに並びます</p>
+      <div id="session-tools">
+        <button type="button" id="plus" aria-label="新しい会話" title="新しい会話"><svg class="ic" viewBox="0 0 20 20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M10 4v12M4 10h12"/></svg></button>
+      </div>
+      <input id="find-text" hidden placeholder="agent を探す" autocomplete="off" aria-label="agent を探す">
+      <section id="agent-set" hidden aria-label="agent の設定"><kg-agent-settings id="agent-settings"></kg-agent-settings></section>
+      <section id="press" hidden aria-label="押す操作">
+        <header id="press-hd">
+          <kg-back id="press-back" depth="1" aria-label="前の画面へ（2 度押しで一覧）" title="前の画面へ（2 度押しで一覧）"></kg-back>
+          <h1>押す操作</h1>
+        </header>
+        <p id="note" role="status"></p>
+        <section id="asks" aria-label="止まった段"></section>
+        <section id="offer" aria-label="押す操作にする"></section>
+        <section id="list" aria-label="押す操作の一覧"></section>
+        <section id="take" aria-label="受け取る">
+          <label for="take-path">file の場所（Finder で選んで option+右 click →パス名をコピー）</label>
+          <input id="take-path" placeholder="/Users/…/Downloads/….kangae-press.json" autocomplete="off" spellcheck="false">
+          <div class="btns"><button id="take-go" type="button" class="btn">受け取る</button></div>
+          <div id="take-card"></div>
+        </section>
+        <p class="why">押す操作は、終わった仕事を段に分けて覚えた物です。「押す」で同じ結果をもう一度出します。段が合わない時は探し直し、それでも駄目なら止まってあなたに聞きます。</p>
+      </section>
+      <section id="remote" hidden aria-label="スマホで操作">
+        <header id="remote-hd">
+          <kg-back id="remote-back" depth="1" aria-label="前の画面へ（2 度押しで一覧）" title="前の画面へ（2 度押しで一覧）"></kg-back>
+          <h1>スマホで操作</h1>
+        </header>
+        <div id="remote-body"></div>
+      </section>
+      <section id="settings" hidden aria-label="設定">
+        <header id="settings-hd">
+          <kg-back id="settings-back" depth="1" aria-label="前の画面へ（2 度押しで一覧）" title="前の画面へ（2 度押しで一覧）"></kg-back>
+          <h1>設定</h1>
+        </header>
+        <kg-settings id="user-pop">
+          <details><summary>会話</summary>
+            <label id="viewer-row" title="agent の行の「見る」で、その agent が触った folder を開く app（人が押した時だけ・前に出ます）"><span>見る で開く app</span><select id="viewer-app" aria-label="見る で開く app"><option value="Finder">Finder</option></select></label>
+          </details>
+          <details><summary>画面の操作</summary>
+            <kg-toggle id="open-allow" label="必要な tab や app を、聞かずに裏で開く" hint="agent が目的のために tab や app を開く時、確認を出さずに裏で開きます（既定は聞く・開いた時は知らせます。書き込みや操作の許可は今まで通りです）"></kg-toggle>
+            <kg-toggle id="cursor-overlay" label="agent のカーソルを見せる" hint="agent が操作している位置に、小さなカーソルを重ねて見せます（既定は見せない・あなたの本物のカーソルは動きません）"></kg-toggle>
+            <kg-toggle id="named-only" label="tab では名前で指す操作だけ使わせる" hint="tab では、ボタンや入力欄を見える名前で指す操作だけを使わせます（既定はどちらも使える）。名前で指せない相手には、今までどおり使えます"></kg-toggle>
+            <kg-toggle id="app-shot-off" label="op のある app では窓の写真を撮らせない" hint="この Mac に操作の口がある app では、agent に窓の写真を撮らせません"></kg-toggle>
+          </details>
+          <details id="remembered-sec"><summary>覚えた許し</summary>
+            <p id="remembered-empty">まだ何も覚えていません</p>
+            <ul id="remembered-list"></ul>
+          </details>
+          <details id="learned-sec"><summary>覚えた物</summary>
+            <p id="learned-empty">まだありません</p>
+            <section id="cmds" aria-label="登録した物" hidden></section>
+            <section id="mods" aria-label="覚えた手順" hidden></section>
+            <section id="op-drafts" aria-label="下書き" hidden></section>
+          </details>
+        </kg-settings>
+      </section>
+    </section>
+    <section id="chat" role="log" aria-live="polite" aria-label="chat">
+      <header id="hd">
+        <kg-back id="hd-list" depth="1" aria-label="前の画面へ（2 度押しで一覧）" title="前の画面へ（2 度押しで一覧）"></kg-back>
+        <span class="av" id="hd-av">·</span>
+        <div class="who">
+          <div class="name" id="hd-name">agent</div>
+          <div class="st" id="hd-st"></div>
+        </div>
+        <label id="provider-line" hidden>どの AI で
+          <select id="provider" aria-label="どの AI で"></select>
+        </label>
+        <button type="button" id="hd-more" aria-expanded="false" aria-label="この会話の操作" title="この会話の操作">…</button>
+      </header>
+      <div id="more" hidden>
+        <div id="add-line">
+          <button type="button" id="add-tab" disabled>＋今のタブ</button>
+          <button type="button" id="rename">名前を変える</button>
+        </div>
+        <div id="place-line">
+          <button type="button" id="open-tab">タブで開く</button>
+          <details id="desk-fold">
+            <summary>デスクトップ</summary>
+            <button type="button" id="to-desktop">デスクトップに置く</button>
+            <button type="button" id="term-to-desktop">ターミナルをデスクトップに置く</button>
+            <button type="button" id="tab-to-desktop" disabled>今のタブをデスクトップに置く</button>
+          </details>
+          <span id="desktop-note" hidden></span>
+          <span id="desk-reason" hidden>前面が http か https のタブのとき置ける</span>
+        </div>
+        <div class="attached" id="attached"></div>
+        <div class="history" id="history"></div>
+      </div>
+      <ul id="rows"></ul>
+      <div id="approve" hidden></div>
+      <div id="progress" hidden></div>
+      <div id="need" hidden></div>
+      <div id="next" hidden></div>
+      <button type="button" id="clear-ui" hidden>既定の見た目に戻す</button>
+      <div id="att-chips" hidden></div>
+      <form id="send-form" autocomplete="off">
+        <button type="button" id="attach" aria-label="画像・動画・file を付ける" title="画像・動画・file"><svg class="ic" viewBox="0 0 20 20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M17.87 9.21l-7.66 7.66a5 5 0 0 1-7.08-7.08l7.66-7.66a3.33 3.33 0 0 1 4.72 4.72l-7.67 7.66a1.67 1.67 0 0 1-2.36-2.36l7.08-7.07"/></svg></button>
+        <input id="attach-file" type="file" multiple hidden accept="image/*,video/*,*/*">
+        <textarea id="send-text" rows="1" placeholder="返事を書く"></textarea>
+        <button id="send-btn" aria-label="送る"><svg class="ic" viewBox="0 0 20 20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M10 16V4.5M5 9.5l5-5 5 5"/></svg></button>
+      </form>
+    </section>
+    <section id="thread" hidden aria-label="agent 同士の chat">
+      <header>
+        <kg-back id="thread-back" depth="1" aria-label="前の画面へ（2 度押しで一覧）" title="前の画面へ（2 度押しで一覧）"></kg-back>
+        <h1>agent 同士の chat</h1>
+      </header>
+      <kg-thread id="thread-log"></kg-thread>
+    </section>
+  </div>
+  <!-- ガラスの屈折（台帳 frontend-libs §7 のレシピ）。backdrop-filter に SVG filter を渡せるのは Chromium だけで、
+       WebKit（bar の WKWebView）は無視する＝歪みが消えるだけで破綻しない -->
+  <svg id="glass-defs" width="0" height="0" aria-hidden="true" focusable="false">
+    <filter id="liquid" x="-20%" y="-20%" width="140%" height="140%" color-interpolation-filters="sRGB">
+      <feTurbulence type="fractalNoise" baseFrequency="0.009 0.013" numOctaves="2" seed="7" result="n"/>
+      <feGaussianBlur in="n" stdDeviation="3" result="nb"/>
+      <feDisplacementMap in="SourceGraphic" in2="nb" scale="22" xChannelSelector="R" yChannelSelector="G"/>
+    </filter>
+  </svg>
+  <kg-toast id="toast"></kg-toast>
+  <div id="drop-pick" class="card" hidden></div>
+  <script src="press.js"></script>
+  <script src="remote.js"></script>
+  <script type="module" src="kg.js"></script>
+  <script type="module" src="panel.js"></script>
+</body>
+</html>

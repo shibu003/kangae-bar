@@ -1,0 +1,9 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes' ?>
+<hierarchy rotation="0">
+  <node index="0" text="" resource-id="" class="android.widget.FrameLayout" package="com.google.android.apps.docs" content-desc="" bounds="[0,0][1080,2400]">
+    <node index="0" text="共有" resource-id="com.google.android.apps.docs:id/share" class="android.widget.Button" content-desc="" clickable="true" bounds="[100,200][300,300]" />
+    <node index="1" text="" resource-id="com.google.android.apps.docs:id/more" class="android.widget.ImageButton" content-desc="その他のオプション &amp; 設定" clickable="true" bounds="[900,50][1000,150]" />
+    <node index="2" text="予定 &lt;3枚&gt;" resource-id="" class="android.widget.TextView" content-desc="" bounds="[0,400][1080,500]" />
+    <node index="3" text="壊れた" resource-id="" class="android.view.View" content-desc="" bounds="[nope]" />
+  </node>
+</hierarchy>

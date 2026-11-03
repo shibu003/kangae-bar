@@ -1,0 +1,8 @@
+{
+  "manifest_version": 3,
+  "name": "h2-probe",
+  "version": "0.0.1",
+  "description": "H2 測定用（製品に入れない）: tab を引き出した時の Chrome の event と、元へ戻せるかを記録する",
+  "permissions": ["tabs", "storage"],
+  "background": { "service_worker": "sw.js" }
+}

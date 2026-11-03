@@ -1,0 +1,17 @@
+{
+  "manifest_version": 3,
+  "name": "Kangae",
+  "version": "0.0.2",
+  "description": "AI があなたの Chrome の tab を、あなたの許した範囲で読み・操作できるようにする拡張（Kangae Bar と一緒に使います）。新しいタブでは、思った事を投げると返事と次の一手が返ります",
+  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAsyoYhjXkD3zRUZuphhqeqzsEqdwqTnJxG+FcogxiN+ZOBVYOCWfhQdTAaJNhePjjV/kmDco96F5C452P7JKdQEKoCNSNuq3uJ2PMECRd7mpde5CoybTf3N8RNgzlqbz3Ts9KKtwSxrGZNkb54V2NTspm9VLXCIwWHTYVqJVFrT0FT780s/75VYk/Ho/QzrTreS8U9FL7pj7tUgv4roX09LoFwWAnqnDlPGEoBsNIzsGJri7Rw9XG4ke65mCWwayKPnPGj+Ws2vqj4xW5rF1+4sIainK+hsIoCJ16kz8ncoOGjhHhbitGiqxxlECUFyijMkUB8YQnyHdltApvd1D0IQIDAQAB",
+  "permissions": ["nativeMessaging", "alarms", "tabs", "tabGroups", "sidePanel", "declarativeNetRequest", "scripting", "webNavigation", "offscreen", "cookies", "storage"],
+  "action": { "default_icon": { "16": "icons/16.png", "48": "icons/48.png", "128": "icons/128.png" } }, "icons": { "16": "icons/16.png", "48": "icons/48.png", "128": "icons/128.png" },
+  "side_panel": { "default_path": "panel.html" },
+  "background": { "service_worker": "sw.js", "type": "module" },
+  "chrome_url_overrides": { "newtab": "newtab.html" },
+  "minimum_chrome_version": "121",
+  "host_permissions": ["http://*/*", "https://*/*"],
+  "optional_permissions": ["history"],
+  "declarative_net_request": { "rule_resources": [{ "id": "embed", "enabled": true, "path": "embed-rules.json" }] }
+}
+

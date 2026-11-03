@@ -1,0 +1,25 @@
+{
+  "v": 1,
+  "id": "d0c0ffee",
+  "name": "スマホの写真 3 枚を Google ドキュメントにして共有",
+  "madeAt": 1760400000000,
+  "fields": {
+    "photos": { "ask": true, "label": "写真 3 枚" },
+    "pair_code": { "ask": true, "label": "スマホに出る 6 桁の数字と、その下の数字の列" },
+    "share_to": { "ask": true, "label": "共有する先" },
+    "title": { "fixed": "写真 3 枚" }
+  },
+  "stages": [
+    { "n": 1, "kind": "env", "goal": "PC に道具を入れる（初回だけ）", "requires": ["brew", "adb", "cmd:scrcpy-build"], "pre": { "kind": "cmd-exit0", "name": "scrcpy-build" }, "post": { "kind": "cmd-exit0", "name": "scrcpy-build" }, "way": { "kind": "runCmd", "name": "scrcpy-build" } },
+    { "n": 2, "kind": "env", "goal": "スマホと繋ぐ", "requires": ["adb"], "post": { "kind": "result", "like": "connected" }, "way": { "kind": "op", "app": "スマホ", "name": "pair", "slots": { "code": { "field": "pair_code" } } } },
+    { "n": 3, "kind": "op", "goal": "写真を新しい順に並べる", "post": { "kind": "result", "like": "listed" }, "way": { "kind": "op", "app": "スマホ", "name": "list_photos", "slots": {} } },
+    { "n": 4, "kind": "op", "goal": "3 枚を選んで確かめる", "post": { "kind": "result", "like": "picked" }, "way": { "kind": "op", "app": "スマホ", "name": "pick_photos", "slots": { "photos": { "field": "photos" } } } },
+    { "n": 5, "kind": "op", "goal": "Google ドキュメントを作って 3 枚を入れる", "post": { "kind": "result", "like": "docs.created" }, "way": { "kind": "agent", "hint": "スマホの Docs に写真を入れる" } },
+    { "n": 6, "kind": "op", "goal": "Google ドキュメントを共有する", "requires": ["login:docs.google.com"], "post": { "kind": "result", "like": "shared" }, "way": { "kind": "op", "app": "Google ドキュメント", "name": "share", "slots": { "to": { "field": "share_to" }, "title": { "field": "title" } } } }
+  ],
+  "expect": { "result": "docs.shared" },
+  "onMismatch": "ask",
+  "limits": { "maxRuns": 1 },
+  "claims": ["共有は外せます", "ドキュメントは消せます", "入れた道具は消せます"],
+  "runs": { "total": 0, "clean": 0 }
+}

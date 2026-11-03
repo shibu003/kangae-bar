@@ -1,0 +1,22 @@
+<!doctype html><meta charset="utf-8"><title>expA</title>
+<body><h1 id="role"></h1>
+<form id="f"><input id="q" autocomplete="off"><button id="send">送信</button></form>
+<ul id="saved"></ul>
+<script>
+const role = new URLSearchParams(location.search).get('role');
+document.getElementById('role').textContent = role;
+const K = 'saved:' + role, E = 'ev:' + role;
+const get = (k) => JSON.parse(localStorage.getItem(k) || '[]');
+const q = document.getElementById('q');
+function render() { document.getElementById('saved').innerHTML = get(K).map((s) => '<li>' + s.text + '</li>').join(''); }
+// isTrusted を page 側で記録（content script の event が false かを測る）
+for (const t of ['keydown', 'input', 'click', 'submit'])
+  addEventListener(t, (e) => { const l = get(E); l.push({ type: t, trusted: e.isTrusted, t: Date.now() }); localStorage.setItem(E, JSON.stringify(l)); }, true);
+document.getElementById('f').addEventListener('submit', (e) => {
+  e.preventDefault();
+  const l = get(K); l.push({ text: q.value, t: Date.now() }); localStorage.setItem(K, JSON.stringify(l));
+  q.value = ''; render();
+});
+render();
+if (role === 'T0') q.focus();
+</script>

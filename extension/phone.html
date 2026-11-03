@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="ja">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="referrer" content="no-referrer">
+<meta name="color-scheme" content="light dark">
+<title>Kangae</title>
+<style>
+/* 色と間隔は docs/design/DESIGN.md の token。頭の題・見出し・説明の帯は無い（触る所だけ） */
+:root {
+  --bg: #f7f7f5; --card: #ffffff; --muted: #efefec; --fg: #20211f; --muted-fg: #565952; --subtle-fg: #5f635b;
+  --border: #dddfd8; --control-border: #7c8176; --primary: #3f5137; --primary-fg: #ffffff; --primary-hover: #34452d; --primary-active: #2b3a25;
+  --turn: #875800; --fail: #ac3437; --work: #386841; --hover: #e8eae4; --active: #dfe3d9; --focus: #536c43; --disabled-bg: #e8eae4; --disabled-fg: #5f635b;
+  --ag0: #dce6f5; --ag1: #f2dfd0; --ag2: #d9e8dc; --ag3: #e6dff2; --ag4: #f1dbe3; --ag5: #d4e8ea; --ag-fg: #243025;
+  --font: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Yu Gothic UI", "Segoe UI", sans-serif;
+  --hit: 44px; --row: 72px;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #191a18; --card: #222420; --muted: #2c2e29; --fg: #eeefeb; --muted-fg: #b9bdb2; --subtle-fg: #afb4a8;
+    --border: #3d4138; --control-border: #818778; --primary: #c0d3ac; --primary-fg: #1b2516; --primary-hover: #d0dfc1; --primary-active: #e1ebd7;
+    --turn: #e8c275; --fail: #ffaaa4; --work: #a8c69c; --hover: #34382f; --active: #3d4436; --focus: #c0d3ac; --disabled-bg: #34382f; --disabled-fg: #afb4a8;
+    --ag0: #344666; --ag1: #624334; --ag2: #345440; --ag3: #514466; --ag4: #613b49; --ag5: #31545b; --ag-fg: #f4f4ee;
+  }
+}
+* { box-sizing: border-box; }
+html { background: var(--bg); }
+body { margin: 0; min-height: 100dvh; color: var(--fg); background: var(--bg); font: 14px/24px var(--font); -webkit-font-smoothing: antialiased; }
+button { font: inherit; color: inherit; }
+button:focus-visible, textarea:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+[hidden] { display: none !important; }
+svg { width: 20px; height: 20px; flex: none; stroke: currentColor; fill: none; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+
+/* 一覧: 行は隙間なし・区切りは線 1 本・頭の帯なし（7 件が 390px 幅で scroll なしで入る） */
+#listView { max-width: 480px; margin: 0 auto; padding-top: env(safe-area-inset-top, 0); padding-bottom: env(safe-area-inset-bottom, 0); }
+.list { list-style: none; margin: 0; padding: 0; }
+.item { display: flex; align-items: stretch; border-bottom: 1px solid var(--border); }
+.row { flex: 1; min-width: 0; min-height: var(--row); padding: 12px 16px; display: flex; gap: 12px; align-items: center; border: 0; background: none; text-align: left; cursor: pointer; }
+.row:hover { background: var(--hover); }
+.row:active { background: var(--active); }
+.av { width: 40px; height: 40px; border-radius: 50%; flex: none; display: grid; place-items: center; color: var(--ag-fg); font-size: 16px; font-weight: 600; }
+.body { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.top { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 8px; min-width: 0; }
+.name { flex: 1 1 6em; min-width: 0; font-size: 14px; line-height: 20px; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.st { flex: none; display: inline-flex; align-items: center; gap: 6px; font-size: 12px; line-height: 18px; font-weight: 500; color: var(--muted-fg); white-space: nowrap; }
+.st.turn { color: var(--turn); } .st.work { color: var(--work); } .st.fail { color: var(--fail); }
+.dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; display: block; }
+.last { font-size: 13px; line-height: 20px; color: var(--muted-fg); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.go { flex: none; min-width: var(--hit); margin: 0 12px 0 0; align-self: center; min-height: var(--hit); padding: 0 12px; border: 1px solid var(--control-border); border-radius: 10px; background: none; font-size: 12px; font-weight: 500; cursor: pointer; }
+.go:hover { background: var(--hover); }
+.go:disabled { color: var(--disabled-fg); border-color: var(--border); background: var(--disabled-bg); cursor: not-allowed; }
+.bar { width: 100%; min-height: var(--hit); padding: 8px 16px; border: 0; background: none; color: var(--muted-fg); font-size: 12px; font-weight: 500; text-align: left; cursor: pointer; }
+.bar:hover { background: var(--hover); }
+.bar:disabled { cursor: not-allowed; }
+.empty { margin: 24px 16px; text-align: center; color: var(--muted-fg); }
+
+/* 状態の 1 行（つながらない・QR など） */
+.state { margin: 16px; padding: 16px; border: 1px solid var(--border); border-radius: 14px; background: var(--card); display: flex; flex-direction: column; gap: 8px; }
+.msg { margin: 0; font-size: 14px; line-height: 22px; overflow-wrap: anywhere; }
+.code { margin: 0; font-size: 28px; line-height: 40px; font-weight: 600; letter-spacing: .12em; font-variant-numeric: tabular-nums; }
+.btn { min-height: var(--hit); padding: 8px 16px; border: 0; border-radius: 10px; background: var(--primary); color: var(--primary-fg); font-size: 12px; line-height: 20px; font-weight: 500; cursor: pointer; }
+.btn:hover { background: var(--primary-hover); }
+.btn:active { background: var(--primary-active); }
+.btn.quiet { background: transparent; color: var(--fg); }
+.btn.quiet:hover { background: var(--hover); }
+.btn:disabled, .send:disabled { background: var(--disabled-bg); color: var(--disabled-fg); cursor: not-allowed; }
+
+/* 会話: 上は ○＜・avatar・名前・状態の点だけ。真ん中だけ scroll */
+.conv { height: 100dvh; max-width: 480px; margin: 0 auto; display: flex; flex-direction: column; padding-top: env(safe-area-inset-top, 0); }
+.ctop { flex: none; display: flex; align-items: center; gap: 8px; padding: 4px 16px 4px 4px; border-bottom: 1px solid var(--border); }
+.ctop .av { width: 32px; height: 32px; font-size: 12px; }
+.ctop .name { flex: 1; }
+.cdot { width: 8px; height: 8px; border-radius: 50%; background: var(--subtle-fg); flex: none; }
+.cdot.turn { background: var(--turn); } .cdot.work { background: var(--work); } .cdot.fail { background: var(--fail); }
+.iconbtn { width: var(--hit); height: var(--hit); flex: none; border: 0; border-radius: 10px; background: none; display: grid; place-items: center; color: var(--fg); cursor: pointer; }
+.iconbtn:hover { background: var(--hover); }
+.ring { width: 28px; height: 28px; border: 1px solid var(--control-border); border-radius: 50%; display: grid; place-items: center; }
+.ring svg { width: 16px; height: 16px; }
+.line { margin: 0; padding: 8px 16px; font-size: 12px; line-height: 20px; color: var(--turn); border-bottom: 1px solid var(--border); }
+.msgs { flex: 1; min-height: 0; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 12px; scrollbar-width: thin; }
+.msg { display: flex; flex-direction: column; align-items: flex-start; }
+.msg.mine { align-items: flex-end; }
+.bub { max-width: min(88%, 640px); padding: 12px 16px; border-radius: 16px 16px 16px 6px; background: var(--card); white-space: pre-wrap; overflow-wrap: anywhere; line-break: strict; }
+.msg.mine .bub { background: var(--muted); border-radius: 16px 16px 6px 16px; }
+.more { align-self: center; min-height: var(--hit); padding: 8px 16px; border: 0; border-radius: 10px; background: none; color: var(--muted-fg); font-size: 12px; font-weight: 500; cursor: pointer; }
+.appr { margin: 0 16px 8px; padding: 16px; border: 1px solid var(--border); border-radius: 14px; background: var(--card); display: flex; flex-direction: column; gap: 8px; flex: none; }
+.appr h3 { margin: 0; font-size: 14px; line-height: 22px; font-weight: 600; overflow-wrap: anywhere; }
+.appr p { margin: 0; font-size: 12px; line-height: 20px; color: var(--muted-fg); }
+.appr .btns { display: flex; gap: 8px; }
+.appr .btns .btn { flex: 1; }
+.composer { flex: none; margin: 8px 16px 0; border: 1px solid var(--control-border); border-radius: 20px; background: var(--card); padding: 8px; display: flex; align-items: flex-end; gap: 8px; }
+.composer textarea { flex: 1; min-height: 48px; max-height: 144px; resize: none; border: 0; outline: 0; background: none; color: var(--fg); font: 14px/24px var(--font); padding: 12px; }
+.send { width: var(--hit); height: var(--hit); flex: none; border: 0; border-radius: 50%; background: var(--primary); color: var(--primary-fg); display: grid; place-items: center; cursor: pointer; }
+.note { flex: none; margin: 0; padding: 4px 16px calc(12px + env(safe-area-inset-bottom, 0)); min-height: calc(16px + env(safe-area-inset-bottom, 0)); font-size: 12px; line-height: 20px; color: var(--turn); }
+.toast { position: fixed; left: 50%; bottom: calc(24px + env(safe-area-inset-bottom, 0)); transform: translateX(-50%); max-width: min(320px, calc(100% - 32px)); padding: 8px 16px; border: 1px solid var(--border); border-radius: 999px; background: var(--card); color: var(--fg); font-size: 12px; line-height: 20px; box-shadow: 0 4px 16px rgb(0 0 0 / .16); }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; scroll-behavior: auto !important; } }
+</style>
+<body>
+  <main id="listView">
+    <div id="state" class="state" role="status" hidden>
+      <p id="msg" class="msg"></p>
+      <p id="code" class="code" hidden></p>
+      <button id="act" type="button" class="btn" hidden></button>
+    </div>
+    <ul id="list" class="list"></ul>
+    <p id="empty" class="empty" hidden></p>
+    <button id="baropen" type="button" class="bar" hidden></button>
+  </main>
+  <section id="convView" class="conv" hidden>
+    <header class="ctop">
+      <button id="back" type="button" class="iconbtn" aria-label="前の画面へ" title="前の画面へ"><span class="ring"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M12.5 4.5 7 10l5.5 5.5"/></svg></span></button>
+      <span id="cav" class="av" aria-hidden="true"></span>
+      <span id="cname" class="name"></span>
+      <span id="cdot" class="cdot" role="img"></span>
+    </header>
+    <p id="cline" class="line" role="status" hidden></p>
+    <div id="msgs" class="msgs" role="log" aria-live="polite"></div>
+    <div id="appr"></div>
+    <form id="form" class="composer" autocomplete="off">
+      <textarea id="in" rows="1" placeholder="返事を書く" aria-label="返事を書く"></textarea>
+      <button id="send" type="submit" class="send" aria-label="送る" title="送る" disabled><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 16V4m-5 5 5-5 5 5"/></svg></button>
+    </form>
+    <p id="note" class="note" role="status" aria-live="polite"></p>
+  </section>
+  <div id="toast" class="toast" role="status" aria-live="polite" aria-atomic="true" hidden></div>
+  <script type="module" src="phone.js"></script>
+</body>

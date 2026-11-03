@@ -1,0 +1,27 @@
+Kangae Bar が開かない時（最初の 1 回だけ）
+
+この app は、まだ Apple の公証（notarization）を受けていません。
+そのため macOS は、ダウンロードした物を最初に開く 1 回だけ止めます。下の手で 1 回通すと、次からは double-click で開きます。
+Apple の手順: https://support.apple.com/ja-jp/102445
+
+1. 「Kangae Bar.app」を Finder で「アプリケーション」フォルダへ移す
+   （ダウンロードのフォルダのまま開くと、macOS が中の部品を仮の場所に隔離して動けなくなります）
+
+2. Kangae Bar.app を double-click する
+   「開けません」「確認できません」の窓が出たら「完了」か「OK」を押す（「ゴミ箱に入れる」は押さない）
+
+3. お使いの macOS で、どちらか:
+   macOS 15 以降（Sequoia・Tahoe）:
+     アップルメニュー › システム設定 › プライバシーとセキュリティ を開き、下の方の
+     「“Kangae Bar”は…」の横の「このまま開く」を押す → password を入れる → もう一度出た窓で「開く」
+   macOS 14（Sonoma）:
+     Finder で Kangae Bar.app を右 click（control + click）→「開く」→ 出た窓で「開く」
+     （上の「このまま開く」でも開けます）
+
+4. 開くと Kangae Bar の窓が画面に出ます。しまった後は、メニューバー右の「考」か ⌥Space で出せます
+
+それでも開かない・窓に「macOS が止めました」と出た時:
+  ターミナル（アプリケーション › ユーティリティ › ターミナル）を開き、次の 1 行を貼って Enter を押してから、Kangae Bar.app を開き直す
+    xattr -dr com.apple.quarantine "/Applications/Kangae Bar.app"
+  （ダウンロードの印を消すだけです。この app を入れると決めた時だけ打ってください）
+  自分のホームの「アプリケーション」に置いた人は "/Applications/…" を "$HOME/Applications/…" に変える

@@ -1,0 +1,36 @@
+{
+  "compilerOptions": {
+    // Environment setup & latest features
+    "lib": ["ESNext"],
+    "target": "ESNext",
+    "module": "Preserve",
+    "moduleDetection": "force",
+    "jsx": "react-jsx",
+    "allowJs": true,
+    "types": ["bun"],
+
+    // Bundler mode
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "verbatimModuleSyntax": true,
+    "noEmit": true,
+    "incremental": true,
+    "tsBuildInfoFile": ".cache/tsc.tsbuildinfo",
+
+    // Best practices
+    "strict": true,
+    "skipLibCheck": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUncheckedIndexedAccess": true,
+    "noImplicitOverride": true,
+
+    // Some stricter flags (disabled by default)
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "noPropertyAccessFromIndexSignature": false
+  },
+
+  // 型の検査に入れない物（出力・vendor・Swift の build）。node_modules は既定で除外
+  "include": ["src", "test", "tools", "extension", "exp", "docs/verify"],
+  "exclude": ["node_modules", "extension/vendor", "docs/verify/*/run*", "**/dist", "bar"]
+}

@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="ja">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kangae</title>
+<style>
+:root { --bg:#0f1220; --fg:#e8eaf3; --dim:#7b819a; --line:#2a2f47; --accent:#8fb4ff; --w-read:720px; }
+@media (prefers-color-scheme: light) {
+  :root { --bg:#f6f7fb; --fg:#1b1e2e; --dim:#6b7089; --line:#d9dcea; --accent:#2f5fd0; }
+}
+html, body { height:100%; }
+body {
+  margin:0 auto; max-width:var(--w-read); display:flex; flex-direction:column; align-items:center; gap:16px; padding-top:32px; box-sizing:border-box; /* W123: 中央の読める幅 720px が上限（DESIGN.md §4）。card は desk の割合・window は desk の中に clamp なので幅を狭めても消えない */
+  background:var(--bg); color:var(--fg); font:15px/1.6 -apple-system,"Hiragino Sans",sans-serif;
+}
+h1 { margin:0; font-size:13px; font-weight:500; letter-spacing:.3em; color:var(--dim); }
+button {
+  font:inherit; color:inherit; background:transparent; border:1px solid var(--line);
+  border-radius:10px; padding:10px 18px; cursor:pointer;
+}
+button:hover { border-color:var(--accent); color:var(--accent); }
+#tools { display:flex; gap:8px; align-items:center; }
+#more { padding:10px 14px; }
+#menu { display:flex; }
+#menu[hidden] { display:none; }
+#desk { position:relative; flex:1; align-self:stretch; margin:8px 16px 16px; overflow:hidden; }
+#desk-empty { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; color:var(--dim); font-size:13px; pointer-events:none; }
+.card {
+  position:absolute; width:140px; box-sizing:border-box; display:flex; align-items:center; gap:6px; padding:6px 8px;
+  border-radius:8px; font-size:13px; line-height:1.4; cursor:pointer; user-select:none; touch-action:none;
+}
+.card.session, .card.terminal { border:1px solid var(--line); }
+.card.tab { border:1px solid transparent; }
+.card:hover { border-color:var(--accent); }
+.card.dragging { opacity:.8; z-index:2; }
+.card .name { flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.card img { width:16px; height:16px; flex:none; }
+.card .mark { flex:none; color:var(--dim); font-size:12px; }
+.card .x { flex:none; border:0; padding:0 2px; color:var(--dim); font-size:14px; line-height:1; background:transparent; border-radius:4px; cursor:pointer; visibility:hidden; }
+.card:hover .x { visibility:visible; }
+.card .x:hover { color:var(--fg); }
+.win {
+  position:absolute; display:flex; flex-direction:column; box-sizing:border-box; min-width:240px; min-height:160px;
+  background:var(--bg); border:1px solid var(--line); border-radius:10px; box-shadow:0 8px 28px rgba(0,0,0,.35); overflow:hidden;
+}
+.win:focus-within, .win.front { border-color:var(--accent); }
+.win-bar { display:flex; align-items:center; gap:6px; padding:4px 6px 4px 10px; font-size:12px; color:var(--dim); cursor:grab; user-select:none; touch-action:none; border-bottom:1px solid var(--line); }
+.win-title { flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.win-bar button { padding:1px 8px; font-size:12px; border-radius:6px; border-color:transparent; }
+.win-body { flex:1; min-height:0; position:relative; }
+.win-body .term { position:absolute; inset:0; padding:6px 0 0 8px; background:#111; }
+.win-body iframe { position:absolute; inset:0; width:100%; height:100%; border:0; background:#fff; }
+.win-grip { position:absolute; right:0; bottom:0; width:16px; height:16px; cursor:nwse-resize; touch-action:none; background:linear-gradient(135deg, transparent 50%, var(--dim) 50%, var(--dim) 58%, transparent 58%, transparent 72%, var(--dim) 72%, var(--dim) 80%, transparent 80%); }
+#desk.busy iframe { pointer-events:none; }
+</style>
+<body>
+  <h1>Kangae</h1>
+  <div id="tools"><button id="open" type="button">会話を開く</button><button id="more" type="button" aria-expanded="false" aria-label="その他" title="その他">…</button></div>
+  <div id="menu" hidden><button id="phone" type="button">スマホで操作</button></div>
+  <div id="desk"><p id="desk-empty" hidden>Bar の会話の『…』→『デスクトップ』で、会話や tab をここに置けます</p></div>
+  <link rel="stylesheet" href="vendor/xterm.css">
+  <script src="vendor/xterm.js"></script>
+  <script src="vendor/addon-fit.js"></script>
+  <script src="port.js"></script>
+  <script src="newtab.js"></script>
+</body>
